@@ -1,83 +1,122 @@
 # coding=iso-8859-1
-
+#  编码格式是iso-8895-1
 # TODO:
 # -test graph generation APIs (from adjacency, etc..)
+# 将要做的是测试图像产生APi，测试删除节点，删除边的方法，测试公共类的set的方法
 # -test del_node, del_edge methods
 # -test Common.set method
 
 from __future__ import division, print_function
+# 导入division和print_function，division是新的除法特性，原来的除号对于分子分母是整数的情况会取整，但新特性中在此情况下除法不会取整，取整使用//
+# print_function是新的print函数，如果导入此特性，那么之前的print语句不能用了
 
 import os
+# 导入os模块
 try:
+    # 从hashlib模块中导入sha256部分，sha256是一个加密算法
     from hashlib import sha256
+    # 如果带入失败，则导入sha包，使用里面的new方法作为sha256算法
 except ImportError:
     import sha
     sha256 = sha.new
+
 import subprocess
+# subprocess最早在2.4版本引入，用来生成子进程，并且可以通过管道连接诶他们的输入/输出/错误，以及获得他们的返回值。
 import sys
+# 导入sys模块，是系统模块
 
 import pydotplus
+# 导入pydotplus模块
 import unittest
+# 导入test模块
 
-
+# sys.version_info会返回使用的版本信息，这里的含义是如果版本是2.X版本，PY3为True,否则是False
 PY3 = not sys.version_info < (3, 0, 0)
 
 if PY3:
+    # 如果是python3版本，则Null_SEP=b'',xrange是range
     NULL_SEP = b''
     xrange = range
 else:
+    # 否则NULL_SEP是'',bytes是str
     NULL_SEP = ''
     bytes = str
 
+# find_graphviz方法返回相关exe软件的地址，完整返回如下所示，dot是其中的一个软件
+# {'dot': 'D:\\program\\Graphviz\\bin\\dot.exe',
+#  'twopi': 'D:\\program\\Graphviz\\bin\\twopi.exe',
+#  'neato': 'D:\\program\\Graphviz\\bin\\neato.exe',
+#  'circo': 'D:\\program\\Graphviz\\bin\\circo.exe',
+#  'fdp': 'D:\\program\\Graphviz\\bin\\fdp.exe',
+#  'sfdp': 'D:\\program\\Graphviz\\bin\\sfdp.exe'}
 
 DOT_BINARY_PATH = pydotplus.find_graphviz()['dot']
+# 测试的路径，位于当前目录的子目录
 TEST_DIR = './'
+# 回归测试文件夹，图像地址
 REGRESSION_TESTS_DIR = os.path.join(TEST_DIR, 'graphs')
+# 我的测试地址
 MY_REGRESSION_TESTS_DIR = os.path.join(TEST_DIR, 'my_tests')
 
 
+# 定义测试图像API类，继承自测试模块中的TestCase
 class TestGraphAPI(unittest.TestCase):
-
+# 每次方法之前执行
     def setUp(self):
-
+    # 调用_reset_graphs方法，字面意思是重置图像
         self._reset_graphs()
 
     def _reset_graphs(self):
-
+        # 重置图像，定义图像类，名称是testGraph，图像类型是digraph
         self.graph_directed = pydotplus.Graph(
             'testgraph', graph_type='digraph'
         )
-
+        # 测试保持图像类型
     def test_keep_graph_type(self):
-
+        # 定义点类型，名称是Test，图像类型是graph,点类型的名称是g
         g = pydotplus.Dot(graph_name='Test', graph_type='graph')
 
+        # 确定相等，确定g的类型是graph
         self.assertEqual(g.get_type(), 'graph')
 
+        # 定义点的类型，图像类型是digraph
         g = pydotplus.Dot(graph_name='Test', graph_type='digraph')
-
+        # 确认图像的类型是digraph
         self.assertEqual(g.get_type(), 'digraph')
-
+    # 测试添加类型
     def test_add_style(self):
-
+        # 定义节点名称是mynode
         node = pydotplus.Node('mynode')
+        # 节点添加类型，名称是abc
         node.add_style('abc')
+        # 确定节点的类型是abc
         self.assertEqual(node.get_style(), 'abc')
+        # 添加节点类型是def
         node.add_style('def')
+        # 确定节点类型是abc,def
         self.assertEqual(node.get_style(), 'abc,def')
+        # 添加节点类型是ghi
         node.add_style('ghi')
+        # 确定节点类型是abc,def,ghi
         self.assertEqual(node.get_style(), 'abc,def,ghi')
 
+        # c测试根据节点创造简单图像
     def test_create_simple_graph_with_node(self):
-
+        # 定义点类型数据，名称是g
         g = pydotplus.Dot()
+        # 设置点数据的类型是digraph
         g.set_type('digraph')
+        # 设置节点legend
         node = pydotplus.Node('legend')
+        # 设置节点shape是box
         node.set("shape", 'box')
+        # 图像添加节点node
         g.add_node(node)
+        # 设置节点label是mine
         node.set('label', 'mine')
 
         self.assertEqual(
+            # 确定点数据是'digraph G {\nlegend [label=mine, shape=box];\n}\n'
             g.to_string(),
             'digraph G {\nlegend [label=mine, shape=box];\n}\n'
         )
