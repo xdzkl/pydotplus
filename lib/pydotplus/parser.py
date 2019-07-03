@@ -32,10 +32,14 @@ into a class representation defined by pydotplus.
 
 from __future__ import division, print_function
 
+# sys模块提供对解释器使用或维护的一些变量的访问，以及与解释器强烈交互的函数。它始终可用。
 import sys
 import pydotplus
+# codecs是处理编码格式
 import codecs
 
+# pyparsing模块可以被用来解析简单的名字字符串或代数表达式，同时也可以从复杂格式文本报告中提取数据。
+# 然后你定义的匹配模式也可能会接收到一个无效的格式输入。pyparsing用来从定义良好的数据格式中进行数据提取。
 from pyparsing import __version__ as pyparsing_version
 
 from pyparsing import (
@@ -45,7 +49,7 @@ from pyparsing import (
     ParseResults, CharsNotIn, QuotedString
 )
 
-
+# 判断python版本是否是3.0.0版本
 PY3 = not sys.version_info < (3, 0, 0)
 
 if PY3:
