@@ -142,6 +142,7 @@ class TestGraphAPI(unittest.TestCase):
         self.assertEqual(g.get_subgraphs()[0].get_name(), s.get_name())
         self.assertEqual(g.get_subgraph_list()[0].get_name(), s.get_name())
 
+        # 测试图像序列化
     def test_graph_pickling(self):
 
         import pickle
@@ -218,6 +219,7 @@ class TestGraphAPI(unittest.TestCase):
 
         self.assertEqual([g.get_name() for g in graphs], ['A', 'B'])
 
+
     def _render_with_graphviz(self, filename):
 
         p = subprocess.Popen(
@@ -252,13 +254,17 @@ class TestGraphAPI(unittest.TestCase):
         # f.close()
 
         # g = pydotplus.parse_from_dot_data(graph_data)
+        # 根据filename绘制总图
         g = pydotplus.graph_from_dot_file(filename)
 
+        # 如果总图的类型不是list，将其改变为list
         if not isinstance(g, list):
             g = [g]
 
+            # 使用NULL_SEP将总图的元素进行处理后添加到一起
         jpe_data = NULL_SEP.join([_g.create(format='jpe') for _g in g])
 
+        # 使用sha256对jpe_data进行加密，hexdigest的含义是返回十六进制的摘要
         return sha256(jpe_data).hexdigest()
 
     def test_my_regression_tests(self):
