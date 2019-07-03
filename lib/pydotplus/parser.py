@@ -49,6 +49,7 @@ from pyparsing import (
     ParseResults, CharsNotIn, QuotedString
 )
 
+# 判断python版本是否是3.0.0
 PY3 = not sys.version_info < (3, 0, 0)
 
 if PY3:
