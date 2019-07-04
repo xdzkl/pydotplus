@@ -220,32 +220,45 @@ class TestGraphAPI(unittest.TestCase):
         self.assertEqual([g.get_name() for g in graphs], ['A', 'B'])
 
 
+        # 测试根据graphviz进行渲染，传入的参数是filename
     def _render_with_graphviz(self, filename):
 
+        # popen的作用是执行系统命令
         p = subprocess.Popen(
+            # dot的二进制文件路径，——Tjpe是参数
             (DOT_BINARY_PATH, '-Tjpe'),
+            # cwd是设置的昂前路径
             cwd=os.path.dirname(filename),
+            # stdin是标准输入
             stdin=open(filename, 'rt'),
+            # stderr是标准错误，stdout是标准输出
             stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
+        # 将p的标准输出给stdout
         stdout = p.stdout
-
+        # 设置stdout_output是列表
         stdout_output = list()
         while True:
+            # 根据stdout读出的数据给data
             data = stdout.read()
+            # 如果data为空，则跳出循环
             if not data:
                 break
+                # 将data添加到stdout_output
             stdout_output.append(data)
+            # 关闭标准输出
         stdout.close()
 
+        # 如果输出不为空，那么使用NULL_SEP将列表整合到一个字符串
         if stdout_output:
             stdout_output = NULL_SEP.join(stdout_output)
 
         # pid, status = os.waitpid(p.pid, 0)
         # this returns a status code we should check
+        # 将p进程的状态设为等待
         p.wait()
-
+        # 将标准输出使用sha256加密，hexdigest是
         return sha256(stdout_output).hexdigest()
 
     def _render_with_pydot(self, filename):
@@ -267,19 +280,24 @@ class TestGraphAPI(unittest.TestCase):
         # 使用sha256对jpe_data进行加密，hexdigest的含义是返回十六进制的摘要
         return sha256(jpe_data).hexdigest()
 
+        # 验证我的回归测试
     def test_my_regression_tests(self):
+        # 调用方法根据dot文件进行渲染和比较函数，参数是我的回归测试目录
         self._render_and_compare_dot_files(MY_REGRESSION_TESTS_DIR)
 
     def test_graphviz_regression_tests(self):
         self._render_and_compare_dot_files(REGRESSION_TESTS_DIR)
 
+        # 根据dot文件进行渲染和比较
     def _render_and_compare_dot_files(self, directory):
 
+        # 寻找指定目录下，以dot结尾的文件名
         dot_files = [
             fname for fname in os.listdir(directory)
             if fname.endswith('.dot')
         ]  # and fname.startswith('')]
 
+        # 对dot文件列表进行遍历,dot代指每个文件
         for dot in dot_files:
             os.sys.stdout.write('#')
             os.sys.stdout.flush()
