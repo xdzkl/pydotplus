@@ -209,14 +209,15 @@ class TestGraphAPI(unittest.TestCase):
 
         self.assertEqual(hexdigest, hexdigest_original)
 
+        # 测试多个图
     def test_multiple_graphs(self):
-
+        # 设置图的字符串
         graph_data = 'graph A { a->b };\ngraph B {c->d}'
-
+        # 根据dot_data创造图
         graphs = pydotplus.graph_from_dot_data(graph_data)
-
+        # 验证图的数量是2
         self.assertEqual(len(graphs), 2)
-
+        # 验证图的名称是A 和B
         self.assertEqual([g.get_name() for g in graphs], ['A', 'B'])
 
 
@@ -299,37 +300,44 @@ class TestGraphAPI(unittest.TestCase):
 
         # 对dot文件列表进行遍历,dot代指每个文件
         for dot in dot_files:
+            # 向缓冲区写入内容，这里的内容就是'#'
             os.sys.stdout.write('#')
+            # 刷新缓冲区
             os.sys.stdout.flush()
-
+            # 将dot文件的名称和目录拼接起来
             fname = os.path.join(directory, dot)
 
             try:
+                # 使用pydot进行渲染
                 parsed_data_hexdigest = self._render_with_pydot(fname)
+                # 使用graphviz进行渲染
                 original_data_hexdigest = self._render_with_graphviz(fname)
             except Exception:
+                # 如果出现异常，打印信息
                 print('Failed rendering BAD(%s)' % dot)
                 raise
-
+            # 如果根据pydot和graphviz的效果不一致，打印BAD嘻嘻
             if parsed_data_hexdigest != original_data_hexdigest:
                 print('BAD(%s)' % dot)
-
+            # 验证根据pydot和graphviz的效果一致
             self.assertEqual(parsed_data_hexdigest, original_data_hexdigest)
 
+            # 测试数字节点id
     def test_numeric_node_id(self):
-
+        # 重设图
         self._reset_graphs()
-
+        # 添加节点
         self.graph_directed.add_node(pydotplus.Node(1))
-
+        # 验证图的节点的第一个元素名称是1
         self.assertEqual(self.graph_directed.get_nodes()[0].get_name(), '1')
 
+        # 测试引用节点id
     def test_quoted_node_id(self):
-
+        # 重设图
         self._reset_graphs()
-
+        # 添加节点，名称是node
         self.graph_directed.add_node(pydotplus.Node('"node"'))
-
+        # 验证图的节点的第一个元素的名称是node
         self.assertEqual(
             self.graph_directed.get_nodes()[0].get_name(), '"node"'
         )
