@@ -786,6 +786,7 @@ class InvocationException(Exception):
         return self.value
 
 
+# 定义节点类，继承自Common
 class Node(Common):
     """A graph node.
 
@@ -798,7 +799,7 @@ class Node(Common):
     All the attributes defined in the Graphviz dot language should
     be supported.
     """
-
+    # 初始化函数，name默认为空，obj_dict是None，**attrs是属性集
     def __init__(self, name='', obj_dict=None, **attrs):
 
         #
@@ -806,51 +807,68 @@ class Node(Common):
         # for any GraphViz object are dealt with as if they were Node
         # definitions
         #
-
+        # 如果对象字典不是None，将对象字典给Node的属性obj_dict
         if obj_dict is not None:
             self.obj_dict = obj_dict
         else:
+        # 如果对象字典是空的，那么进行如下操作
+        # 首先将类的属性obj_dict是字典
             self.obj_dict = dict()
 
             # Copy the attributes
-            #
+            # 复制属性，属性一共有以下：attribute,来自attrs
             self.obj_dict['attributes'] = dict(attrs)
+            # 类型是node
             self.obj_dict['type'] = 'node'
+            # 父亲图
             self.obj_dict['parent_graph'] = None
+            # 父亲节点的列表
             self.obj_dict['parent_node_list'] = None
+            # 序列
             self.obj_dict['sequence'] = None
 
             # Remove the compass point
-            #
+            # 移除重复的节点
+
+            # port为空
             port = None
+            # 如果name的类型是basestring 并且name的不是以"开始，
+            # isinstance用来判断一个对象是否是一个已知的类型
             if isinstance(name, basestring) and not name.startswith('"'):
-                idx = name.find(':')
+                # idx的含义是name中是否包含:,如果包含，则返回字符串开始时的索引值，否则返回-1
+                idx = name.find(':'),
+                # 如果idx大于0，并且，小于name的长度
                 if idx > 0 and idx + 1 < len(name):
+                    # 名称是name的开始到idx，port是idx到最后
                     name, port = name[:idx], name[idx:]
 
+                # 如果name的类型是long或者int
             if isinstance(name, (long, int)):
+                # name就将name的类型改变为字符串
                 name = str(name)
 
+            # 设置obj_port的name属性和port属性，quote_if_neccessary是什么函数
             self.obj_dict['name'] = quote_if_necessary(name)
             self.obj_dict['port'] = port
 
         self.create_attribute_methods(NODE_ATTRIBUTES)
 
+        # 设置name
     def set_name(self, node_name):
         """Set the node's name."""
 
         self.obj_dict['name'] = node_name
-
+        # 返回name的值
     def get_name(self):
         """Get the node's name."""
 
         return self.obj_dict['name']
-
+        # 获得port的值
     def get_port(self):
         """Get the node's port."""
 
         return self.obj_dict['port']
-
+        # 添加样式
     def add_style(self, style):
 
         styles = self.obj_dict['attributes'].get('style', None)
@@ -861,7 +879,7 @@ class Node(Common):
             styles.append(style)
 
         self.obj_dict['attributes']['style'] = ','.join(styles)
-
+        # 转成字符串
     def to_string(self):
         """Returns a string representation of the node in dot language.
         """
