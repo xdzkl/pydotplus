@@ -198,15 +198,22 @@ def get_fobj(fname, mode='w+'):
 # http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/414283
 #
 # This version freezes dictionaries used as values within dictionaries.
-#
+
+# 创建累，冰冻字典，继承自字典类
 class frozendict(dict):
+
+	# 私有方法，blocked是什么意思，
     def _blocked_attribute(obj):
+    	# 抛出 属性错误（一个frozendict不能被更改）
         raise AttributeError("A frozendict cannot be modified.")
+      # 块属性 property是什么意思不知道。
     _blocked_attribute = property(_blocked_attribute)
 
+    # 这个地方什么意思不知道
     __delitem__ = __setitem__ = clear = _blocked_attribute
     pop = popitem = setdefault = update = _blocked_attribute
 
+    # 定义new方法，这个地方前后都有两个——是什么意思
     def __new__(cls, *args, **kw):
         new = dict.__new__(cls)
 
@@ -234,9 +241,11 @@ class frozendict(dict):
         dict.__init__(new, *args_, **kw)
         return new
 
+       # 初始化函数
     def __init__(self, *args, **kw):
         pass
 
+      # 定义hash函数
     def __hash__(self):
         try:
             return self._cached_hash
@@ -244,21 +253,23 @@ class frozendict(dict):
             h = self._cached_hash = hash(tuple(sorted(self.items())))
             return h
 
+        # repr函数是什么意思
+           # 初始化函数
     def __repr__(self):
         return "frozendict(%s)" % dict.__repr__(self)
 
+      # 定义hash函数
 
+# dot 关键字
 dot_keywords = ['graph', 'subgraph', 'digraph', 'node', 'edge', 'strict']
 
 id_re_alpha_nums = re.compile('^[_a-zA-Z][a-zA-Z0-9_,]*$', re.UNICODE)
 id_re_alpha_nums_with_ports = re.compile(
     '^[_a-zA-Z][a-zA-Z0-9_,:\"]*[a-zA-Z0-9_,\"]+$', re.UNICODE
-)
 id_re_num = re.compile('^[0-9,]+$', re.UNICODE)
 id_re_with_port = re.compile('^([^:]*):([^:]*)$', re.UNICODE)
 id_re_dbl_quoted = re.compile('^\".*\"$', re.S | re.UNICODE)
 id_re_html = re.compile('^<.*>$', re.S | re.UNICODE)
-
 
 def needs_quotes(s):
     """Checks whether a string is a dot language ID.
