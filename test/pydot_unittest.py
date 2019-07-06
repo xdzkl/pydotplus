@@ -415,18 +415,28 @@ class TestGraphAPI(unittest.TestCase):
         self.assertRaises(TypeError, self.graph_directed.add_edge, 1)
         self.assertRaises(TypeError, self.graph_directed.add_edge, 'a')
 
+        # 测试图，添加子图参数类型
     def test_graph_add_subgraph_argument_type(self):
 
+    	# 不知道什么意思
         self._reset_graphs()
 
+        # 确定graph_directed的add_subgraph会引发TypeError异常
         self.assertRaises(TypeError, self.graph_directed.add_subgraph, 1)
+        # 确定graph_directed的add_subgraph会引发TypeError异常
         self.assertRaises(TypeError, self.graph_directed.add_subgraph, 'a')
 
+        # 测试引用
     def test_quoting(self):
+    	# 导入string 包
         import string
+        # 创建dot数据
         g = pydotplus.Dot()
+        # 添加一个点，节点的名称是test,标签是string.printable，暂时不知道什么意思
         g.add_node(pydotplus.Node("test", label=string.printable))
+        # 创建图，格式是jpe
         data = g.create(format='jpe')
+        # 检测data,即图的大小是0
         self.assertEqual(len(data) > 0, True)
 
 if __name__ == '__main__':
