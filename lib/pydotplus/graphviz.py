@@ -29,23 +29,33 @@ Graphviz's dot language Python interface.
 This module provides with a full interface to create handle modify
 and process graphs in Graphviz's dot language.
 """
-
+	
+# 导入division和print_function这两个函数，是python的新特性
 from __future__ import division, print_function
 
+# 导入os模块
 import os
+# 导入正则模块
 import re
+# 这个模块暂时不知道什么意思，好像是系统命令处理模块
 import subprocess
+# 导入系统处理模块
 import sys
+# 这个模块不知道是什么意思
 import tempfile
+# 导入复制模块
 import copy
 
+# 从operator模块中导入itemgetter函数，这个模块是什么意思，目前不知道
 from operator import itemgetter
 
+# 从当前目录导入parser解析模块
 from . import parser
 
-
+# 判断使用的模块是否是3.0版本,如果是,则PY3的值是True
 PY3 = not sys.version_info < (3, 0, 0)
 
+# 如果是py3版本，那么设置NULL_SEP，basestring是str，long是int,unicode是str,否则是NULL_SEP是''
 if PY3:
     NULL_SEP = b''
     basestring = str
@@ -55,6 +65,7 @@ else:
     NULL_SEP = ''
 
 
+# 设置图的属性，
 GRAPH_ATTRIBUTES = set([
     'Damping', 'K', 'URL', 'aspect', 'bb', 'bgcolor',
     'center', 'charset', 'clusterrank', 'colorscheme', 'comment', 'compound',
@@ -74,7 +85,7 @@ GRAPH_ATTRIBUTES = set([
     'rank'
 ])
 
-
+# 边的属性
 EDGE_ATTRIBUTES = set([
     'URL', 'arrowhead', 'arrowsize', 'arrowtail',
     'color', 'colorscheme', 'comment', 'constraint', 'decorate', 'dir',
@@ -90,7 +101,7 @@ EDGE_ATTRIBUTES = set([
     'rank'
 ])
 
-
+# 节点属性
 NODE_ATTRIBUTES = set([
     'URL', 'color', 'colorscheme', 'comment',
     'distortion', 'fillcolor', 'fixedsize', 'fontcolor', 'fontname',
@@ -103,7 +114,7 @@ NODE_ATTRIBUTES = set([
     'texlbl', 'texmode'
 ])
 
-
+# 集群属性
 CLUSTER_ATTRIBUTES = set([
     'K', 'URL', 'bgcolor', 'color', 'colorscheme',
     'fillcolor', 'fontcolor', 'fontname', 'fontsize', 'label', 'labeljust',
@@ -111,10 +122,11 @@ CLUSTER_ATTRIBUTES = set([
     'penwidth', 'peripheries', 'sortv', 'style', 'target', 'tooltip'
 ])
 
-
+# 判断队形是不是字符串
 def is_string_like(obj):  # from John Hunter, types-free version
     """Check if obj is string."""
     try:
+    	# 将对象直接加一个字符，如果obj是字符串，就可以正常加，否则就会报异常
         obj + ''
     except (TypeError, ValueError):
         return False
