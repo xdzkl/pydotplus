@@ -132,25 +132,37 @@ def is_string_like(obj):  # from John Hunter, types-free version
         return False
     return True
 
-
+    # 获得文件对象，f的含义是file
 def get_fobj(fname, mode='w+'):
+	# 获得一个合适的文件对象
     """Obtain a proper file object.
-
+	
+	# 参数ig
     Parameters
     ----------
+    # fname：s是一个字符串，文件对象，文件描述器
     fname : string, file object, file descriptor
+    	如果一个字符串或者是文件描述器，接着，我们创建一个文件对象，
         If a string or file descriptor, then we create a file object.
+        如果fname是一个文件对象，我们什么也不做，忽略特定的mode参数
         If *fname*
         is a file object, then we do nothing and ignore the specified *mode*
         parameter.
+      mode：字符串，
     mode : str
+    	文件打开的模式
         The mode of the file to be opened.
-
+	# 返回
     Returns
     -------
+    # fobj:文件对象
     fobj : file object
+    # 文件对象
         The file object.
+     # close:布尔值
     close : bool
+    	# 如果fname是一个字符串，接着close将是True，用来表明文件对象应该被关闭，在写入完后。否则
+    	# close将会是False表明用户，必要的时候，创建文件对象，接下来的操作不应该关闭它
         If *fname* was a string, then *close* will be *True* to signify that
         the file object should be closed after writing to it. Otherwise,
         *close* will be *False* signifying that the user, in essence, created
@@ -158,17 +170,25 @@ def get_fobj(fname, mode='w+'):
         close it.
 
     """
+    # 如果fname是一个字符串，返回fobj对象，并将close设置为True
     if is_string_like(fname):
         fobj = open(fname, mode)
         close = True
+     # 否则。hasattr是什么意思现在不知道，
     elif hasattr(fname, 'write'):
+    	# fname是一个文件类型的对象，或许一个文件IO
         # fname is a file-like object, perhaps a StringIO (for example)
+        # 将fname给fobj，close设置为False
         fobj = fname
         close = False
     else:
+    	# 假定是一个文件描述器，
         # assume it is a file descriptor
+        # fpopen不知道是什么意思
         fobj = os.fdopen(fname, mode)
+        # close设置为False
         close = False
+    # 返回obj对象，close
     return fobj, close
 
 
