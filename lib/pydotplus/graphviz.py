@@ -213,48 +213,70 @@ class frozendict(dict):
     __delitem__ = __setitem__ = clear = _blocked_attribute
     pop = popitem = setdefault = update = _blocked_attribute
 
-    # 定义new方法，这个地方前后都有两个——是什么意思
+    # 定义私有方法__new__，该方法负责独享的创建，__init__方法负责对象的初始化
     def __new__(cls, *args, **kw):
+        #  调用字典的__new__方法
         new = dict.__new__(cls)
 
+        # 定义一个列表，名称是args
         args_ = []
+        # 对args进行遍历
         for arg in args:
+            #  如果arg是一个字典
             if isinstance(arg, dict):
+                # 那么复制一下arg
                 arg = copy.copy(arg)
+                # 对arg进行遍历
                 for k, v in arg.items():
+                    # 如果v的类型frozendict
                     if isinstance(v, frozendict):
+                        # 那么将v给k
                         arg[k] = v
+                        # 否则如果v是字典
                     elif isinstance(v, dict):
+                        # 那么将v变成frozendict，然后给k
                         arg[k] = frozendict(v)
+                    # 否则，如果v是list，
                     elif isinstance(v, list):
+                        # 定义v_为空列表
                         v_ = list()
+                        # 对v进行遍历
                         for elm in v:
+                            # 如果elm是字典
                             if isinstance(elm, dict):
+                                # 那么将elm变成frozendict然后添加进v_
                                 v_.append(frozendict(elm))
+                                # 否则，直接添加进v_
                             else:
                                 v_.append(elm)
+                        # 将v_变成元祖，赋给字典k
                         arg[k] = tuple(v_)
+                # 将arg添加进args_
                 args_.append(arg)
             else:
+                # 如果arg 不是字典，那么直接添加
                 args_.append(arg)
-
+        # 进行字典的初始化
         dict.__init__(new, *args_, **kw)
         return new
 
-       # 初始化函数
+       # 进行对象的初始化
     def __init__(self, *args, **kw):
         pass
 
-      # 定义hash函数
+      # 魔方方法，定义当被hash()调用时的行为
     def __hash__(self):
         try:
+            # 返回对象的_cached_hash属性
             return self._cached_hash
+        # 如果出现属性异常
         except AttributeError:
+            # self的items进行排序，变成元祖，并调用hash方法，结果同时给h和self的_cached_hash属性
             h = self._cached_hash = hash(tuple(sorted(self.items())))
+            #  返回h
             return h
 
-        # repr函数是什么意思
-           # 初始化函数
+        # 定义当被repr()函数调用时的行为
     def __repr__(self):
         return "frozendict(%s)" % dict.__repr__(self)
 
@@ -271,9 +293,12 @@ id_re_with_port = re.compile('^([^:]*):([^:]*)$', re.UNICODE)
 id_re_dbl_quoted = re.compile('^\".*\"$', re.S | re.UNICODE)
 id_re_html = re.compile('^<.*>$', re.S | re.UNICODE)
 
+# 定义需要索引函数，参数是s
 def needs_quotes(s):
-    """Checks whether a string is a dot language ID.
-
+    """
+    检查字符串是否为点语言ID。它将检查字符串是否单独组成由ID中允许或不允许的字符决定。
+    如果字符串是保留的关键字之一，它就会也需要引号，但用户将需要添加他们手动。
+    Checks whether a string is a dot language ID.
     It will check whether the string is solely composed
     by the characters allowed in an ID or not.
     If the string is one of the reserved keywords it will
@@ -287,9 +312,9 @@ def needs_quotes(s):
     # would use a reserved keyword as name. This function will return
     # false indicating that a keyword string, if provided as-is, won't
     # need quotes.
+     # 如果s在dot关键词中，返回false
     if s in dot_keywords:
         return False
-
     chars = [ord(c) for c in s if ord(c) > 0x7f or ord(c) == 0]
     if chars and not id_re_dbl_quoted.match(s) and not id_re_html.match(s):
         return True
