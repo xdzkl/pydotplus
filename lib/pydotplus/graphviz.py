@@ -296,6 +296,7 @@ id_re_html = re.compile('^<.*>$', re.S | re.UNICODE)
 # 定义需要索引函数，参数是s
 def needs_quotes(s):
     """
+    '''
     检查字符串是否为点语言ID。它将检查字符串是否单独组成由ID中允许或不允许的字符决定。
     如果字符串是保留的关键字之一，它就会也需要引号，但用户将需要添加他们手动。
     Checks whether a string is a dot language ID.
@@ -305,6 +306,7 @@ def needs_quotes(s):
     need quotes too but the user will need to add them
     manually.
     """
+    '''
 
     # If the name is a reserved keyword it will need quotes but pydot
     # can't tell when it's being used as a keyword or when it's simply
