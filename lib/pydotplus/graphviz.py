@@ -294,18 +294,18 @@ id_re_dbl_quoted = re.compile('^\".*\"$', re.S | re.UNICODE)
 id_re_html = re.compile('^<.*>$', re.S | re.UNICODE)
 
 # 定义需要索引函数，参数是s
+
 def needs_quotes(s):
-    """
-    '''
-    检查字符串是否为点语言ID。它将检查字符串是否单独组成由ID中允许或不允许的字符决定。
-    如果字符串是保留的关键字之一，它就会也需要引号，但用户将需要添加他们手动。
-    Checks whether a string is a dot language ID.
-    It will check whether the string is solely composed
-    by the characters allowed in an ID or not.
-    If the string is one of the reserved keywords it will
-    need quotes too but the user will need to add them
-    manually.
-    '''
+    # '''
+    # 检查字符串是否为点语言ID。它将检查字符串是否单独组成由ID中允许或不允许的字符决定。
+    # 如果字符串是保留的关键字之一，它就会也需要引号，但用户将需要添加他们手动。
+    # Checks whether a string is a dot language ID.
+    # It will check whether the string is solely composed
+    # by the characters allowed in an ID or not.
+    # If the string is one of the reserved keywords it will
+    # need quotes too but the user will need to add them
+    # manually.
+    # '''
 
     # If the name is a reserved keyword it will need quotes but pydot
     # can't tell when it's being used as a keyword or when it's simply
@@ -313,9 +313,11 @@ def needs_quotes(s):
     # would use a reserved keyword as name. This function will return
     # false indicating that a keyword string, if provided as-is, won't
     # need quotes.
+
      # 如果s在dot关键词中，返回false
     if s in dot_keywords:
         return False
+
     chars = [ord(c) for c in s if ord(c) > 0x7f or ord(c) == 0]
     if chars and not id_re_dbl_quoted.match(s) and not id_re_html.match(s):
         return True
@@ -333,30 +335,44 @@ def needs_quotes(s):
     return True
 
 
+# 
 def quote_if_necessary(s):
     # Older versions of graphviz throws a syntax error for empty values without
     # quotes, e.g. [label=]
+    #  如果s是''
     if s == '':
+        # 返回'""'
         return '""'
 
+        # 如果s是布尔变量
     if isinstance(s, bool):
+        # 如果s是True
         if s is True:
+            # 返回True
             return 'True'
+        # 否则返回False
         return 'False'
 
+        # 如果s不是basestring，那么返回s
     if not isinstance(s, basestring):
         return s
 
+        # 如果s不为空，那么就返回s
     if not s:
         return s
 
+        # 如果需要引用，
     if needs_quotes(s):
+        # replace的字典，
         replace = {'"': r'\"', "\n": r'\n', "\r": r'\r'}
+        # 对替代字典进行遍历
         for (a, b) in replace.items():
+            # 对s字符船进行遍历
             s = s.replace(a, b)
 
+        # 前后添加"
         return '"' + s + '"'
-
+        # 返回s
     return s
 
 
