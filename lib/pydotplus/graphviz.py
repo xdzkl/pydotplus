@@ -305,7 +305,6 @@ def needs_quotes(s):
     If the string is one of the reserved keywords it will
     need quotes too but the user will need to add them
     manually.
-    """
     '''
 
     # If the name is a reserved keyword it will need quotes but pydot
