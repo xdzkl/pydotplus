@@ -52,60 +52,84 @@ from pyparsing import (
 # 判断python版本是否是3.0.0
 PY3 = not sys.version_info < (3, 0, 0)
 
+# 如果是python3版本，basestring = str
 if PY3:
     basestring = str
 
-
+# 定义P_AttrList类
 class P_AttrList:
 
+# 定义初始化函数，传入参数toks
     def __init__(self, toks):
+        # 定义attrs属性，性质是字典
         self.attrs = {}
+        # i=0
         i = 0
 
+        # 当i小于toks的长度
         while i < len(toks):
+            # attrname是toks的第i个元素
             attrname = toks[i]
+            # 如果i+2小于toks的长度，并且，toks的第i+1个元素是=
             if i + 2 < len(toks) and toks[i + 1] == '=':
+                # 那么attrvalue 是toks的第i+2个元素
                 attrvalue = toks[i + 2]
+                # i自加3
                 i += 3
             else:
+                # 否则，attrvalue是None
                 attrvalue = None
+                # i自加1
                 i += 1
-
+            # attrs的key是attrname，值是attrvalue
             self.attrs[attrname] = attrvalue
 
+    # 魔方方法__repr__。在调用repr函数的时候被调用
     def __repr__(self):
+        # 返回字符串，返回类的name和attrs属性
         return "%s(%r)" % (self.__class__.__name__, self.attrs)
 
-
+# 定义类DefaultStatement，继承自P_AttrList
 class DefaultStatement(P_AttrList):
 
+    # 初始化函数，参数是default_type,attrs
     def __init__(self, default_type, attrs):
         self.default_type = default_type
         self.attrs = attrs
 
+    # 重写repr魔方方法
     def __repr__(self):
         return "%s(%s, %r)" % (
             self.__class__.__name__,
             self.default_type, self.attrs
         )
 
-
+# 定义top_graphs是列表
 top_graphs = list()
 
-
+# 定义push_top_grah_stmt函数，参数是str,loc和toks
 def push_top_graph_stmt(str, loc, toks):
+    # attrs是字典
     attrs = {}
+    # g初始化为None
     g = None
 
+    # 对toks进行遍历，元素用element代替
     for element in toks:
+        # 如果element是parseresults,tuple,list之一，并且，element的长度是1 并且elment的第0个元素是basestring
         if (isinstance(element, (ParseResults, tuple, list)) and
                 len(element) == 1 and isinstance(element[0], basestring)):
+        # 将element的第0个元素给element
             element = element[0]
 
+        # 如果element==strict
         if element == 'strict':
+            # 那么attrs['strict'] 是True
             attrs['strict'] = True
 
+        # 否则如果element在graph,digraph中的一个
         elif element in ['graph', 'digraph']:
+            # attrs是空字典
             attrs = {}
 
             g = pydotplus.Dot(graph_type=element, **attrs)
