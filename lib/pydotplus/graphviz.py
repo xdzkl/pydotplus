@@ -374,30 +374,35 @@ def quote_if_necessary(s):
         # 返回s
     return s
 
-
+# 从dot数据中创建图，传入的参数是data
 def graph_from_dot_data(data):
+    # 引导一个图，这个图被DOT格式的数据定义，这个数据被假定为DOT格式，它将被解释，返回一个Dot类，展现图
     """Load graph as defined by data in DOT format.
 
     The data is assumed to be in DOT format. It will
     be parsed and a Dot class will be returned,
     representing the graph.
     """
-
+    # 调用parser中的parse_dot_data
     return parser.parse_dot_data(data)
 
 
+# 定义一个图，从dot文件中，传入的参数是路径
 def graph_from_dot_file(path):
+    # 从dot文件中定义一个图，这个file被假定为Dot格式，它将被读取，解释，返回一个dot类，展现图
     """Load graph as defined by a DOT file.
 
     The file is assumed to be in DOT format. It will
     be loaded, parsed and a Dot class will be returned,
     representing the graph.
     """
-
+# 返回文件权柄，读取格式是rb
     fd = open(path, 'rb')
+    # 读取数据
     data = fd.read()
+    # 关闭文件权柄
     fd.close()
-
+    # 调用从dot_data创建图
     return graph_from_dot_data(data)
 
 
