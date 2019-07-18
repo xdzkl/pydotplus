@@ -408,6 +408,7 @@ def push_node_stmt(s, loc, toks):
 graphparser = None
 
 
+# 接下来要看的代码
 def graph_definition():
     global graphparser
 
@@ -553,46 +554,66 @@ def graph_definition():
     return graphparser
 
 
+# 解释dot数据，传入的参数是data
 def parse_dot_data(data):
+
+    # 定义全局变量，top_graphs
     global top_graphs
 
+    # 定义top_graphs为一个空列表
     top_graphs = list()
 
+    # 如果使用的版本是Python3
     if PY3:
+        # 判断data是否是bytes
         if isinstance(data, bytes):
             # this is extremely hackish
             try:
+                # 寻找idx，先找到charset开始的位置，并将这个位置索引添加7,7是charset的长度
                 idx = data.index(b'charset') + 7
+                # 如果idx的元素在\t\n\r=中的任一个元素，idx自加1
                 while data[idx] in b' \t\n\r=':
                     idx += 1
+                # 将此时的idx赋值给fst
                 fst = idx
+                # 如果idx不在\t\n\r];,中的任意一个，那么idx自加1
                 while data[idx] not in b' \t\n\r];,':
                     idx += 1
+                # 定义charset,它的值是fst:idx中的数据，使用"\分离，使用ascii编码
                 charset = data[fst:idx].strip(b'"\'').decode('ascii')
+                # 使用charset重新对data编码
                 data = data.decode(charset)
             except:
+                # 如果出现异常，那么直接将数据使用utf-8重新编码
                 data = data.decode('utf-8')
     else:
+        # 如果不是python3版本，那么如果data是从codes.UTF_8开始的，那么使用utf-8重新对data进行编码
         if data.startswith(codecs.BOM_UTF8):
             data = data.decode('utf-8')
 
     try:
-
+        # 将grapharser定义为graph_definition方法
         graphparser = graph_definition()
 
+        # 如果解释的版本大于1.2，那么调用parseWithtabs()方法
         if pyparsing_version >= '1.2':
             graphparser.parseWithTabs()
 
+        # 调用parseString方法对data进行处理，返回tokens
         tokens = graphparser.parseString(data)
 
+        # 如果tokens的长度等于1，返回tokens的第0个数据，否则，遍历tokens的所有元素组成的列表
         if len(tokens) == 1:
             return tokens[0]
         else:
             return [g for g in tokens]
-
+            # 如果出现ParseException
     except ParseException:
+        # exc_info用来在对异常进行捕获时，获得异常的详尽信息
         err = sys.exc_info()[1]
+        # 打印err的line，line不知道是什么意思，下面都不知道什么意思
         print(err.line)
         print(" " * (err.column - 1) + "^")
         print(err)
+        # 返回空
         return None
