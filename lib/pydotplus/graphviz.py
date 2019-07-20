@@ -174,7 +174,9 @@ def get_fobj(fname, mode='w+'):
     if is_string_like(fname):
         fobj = open(fname, mode)
         close = True
-     # 否则。hasattr是什么意思现在不知道，
+     # 否则。判断object对象中是否存在name属性，当然对于python的对象而言，
+     # 属性包含变量和方法；有则返回True，没有则返回False；
+     # 需要注意的是name参数是string类型，所以不管是要判断变量还是方法，其名称都以字符串形式传参；
     elif hasattr(fname, 'write'):
     	# fname是一个文件类型的对象，或许一个文件IO
         # fname is a file-like object, perhaps a StringIO (for example)
@@ -184,7 +186,7 @@ def get_fobj(fname, mode='w+'):
     else:
     	# 假定是一个文件描述器，
         # assume it is a file descriptor
-        # fpopen不知道是什么意思
+        # fopen()方法函数返回连接到文件描述符fd的一个打开的文件对象。然后，您可以执行所有文件对象中定义的函数。
         fobj = os.fdopen(fname, mode)
         # close设置为False
         close = False
@@ -199,14 +201,14 @@ def get_fobj(fname, mode='w+'):
 #
 # This version freezes dictionaries used as values within dictionaries.
 
-# 创建累，冰冻字典，继承自字典类
+# 创建类，冰冻字典，继承自字典类
 class frozendict(dict):
 
 	# 私有方法，blocked是什么意思，
     def _blocked_attribute(obj):
     	# 抛出 属性错误（一个frozendict不能被更改）
         raise AttributeError("A frozendict cannot be modified.")
-      # 块属性 property是什么意思不知道。
+      # property() 函数的作用是在新式类中返回属性值。
     _blocked_attribute = property(_blocked_attribute)
 
     # 这个地方什么意思不知道
@@ -406,6 +408,7 @@ def graph_from_dot_file(path):
     return graph_from_dot_data(data)
 
 
+# 根据边创建一个图
 def graph_from_edges(edge_list, node_prefix='', directed=False):
     """Creates a basic graph out of an edge list.
 
@@ -417,27 +420,37 @@ def graph_from_edges(edge_list, node_prefix='', directed=False):
     calculated from one of the symmetric halves of the matrix.
     """
 
+    # 如果directed是True，那么graph的类型是diagraph
     if directed:
         graph = Dot(graph_type='digraph')
 
+        # 否则，graph的类型是graph
     else:
         graph = Dot(graph_type='graph')
 
+    # 对边的列表中的每个元素进行遍历
     for edge in edge_list:
 
+        # 如果边界的第一个元素是str
         if isinstance(edge[0], str):
+            # 将node_prefix添加到边界的第0个元素，赋值给源点
             src = node_prefix + edge[0]
         else:
+            # 否则，Node_prefix添加到边界的第0个元素，并且将第0个元素设置为字符串，赋值给源点
             src = node_prefix + str(edge[0])
 
+        # 判断边的第2个元素是否是字符串，接下来的操作同理，并赋值给目标点
         if isinstance(edge[1], str):
             dst = node_prefix + edge[1]
         else:
             dst = node_prefix + str(edge[1])
 
+        # 根据源点和目标点创建一个边的实例，
         e = Edge(src, dst)
+        # 将边的实例添加到图列表中
         graph.add_edge(e)
 
+# 返回图
     return graph
 
 
@@ -1874,6 +1887,7 @@ class Cluster(Graph):
         self.create_attribute_methods(CLUSTER_ATTRIBUTES)
 
 
+# 定义点类，继承自图
 class Dot(Graph):
     """A container for handling a dot language file.
 
@@ -1882,7 +1896,9 @@ class Dot(Graph):
     the base class 'Graph'.
     """
 
+    # 初始化点的各种属性
     def __init__(self, *argsl, **argsd):
+        # 调用图的初始化函数
         Graph.__init__(self, *argsl, **argsd)
 
         self.shape_files = list()
